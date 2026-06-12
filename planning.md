@@ -16,18 +16,22 @@ You must have at least 3 tools. The three required tools are listed — add any 
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
+The search_listings tool takes in a user input, sets the input parameters with keywords from the input. search_listings returns 3 matching listings sorted by relevance.
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `description` (str): ...
-- `size` (str): ...
-- `max_price` (float): ...
+- `description` (str): style type and item category
+- `size` (str): wardrobe item size 
+- `max_price` (float): maximun item price
 
 **What it returns:**
 <!-- Describe the return value — what fields does a result contain? -->
+The result is a string output with the features for the top result. Fields are item title, price as USD, platform and item condition. Format "<item title> - <$price>, <platform>, <condition>"
+
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if no listings match? -->
+If the search is unable to return items that match the user input, the agent stops and presents the user with a message noting that "No items match this search. Please search for another item". Do not continue to suggest_outfit.
 
 ---
 
@@ -35,17 +39,21 @@ You must have at least 3 tools. The three required tools are listed — add any 
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
+This tool takes the item from search_listings and items in the user's wardrode. The tools suggests one ore more complete outfits combinations. Must be able to handle empty wardrobe or minimal items. 
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `new_item` (dict): ...
-- `wardrobe` (dict): ...
+- `new_item` (dict): item returned from search_listings
+- `wardrobe` (dict): existing items in the user's wardrobe
 
 **What it returns:**
 <!-- Describe the return value -->
+suggest_outfit returns natural language text that suggests an item in the existing wardrobe to pair the new item with. It also may suggest styling details. If there isn't an item to pair with, only suggest styling notes for the item. 
+
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the wardrobe is empty or no outfit can be suggested? -->
+If suggest_outfit fails, quit the loop and inform the user to try another item or increase items in wardrobe. DO not continue to create_fit_card without a complete result from suggest_outfit.
 
 ---
 
@@ -53,13 +61,15 @@ You must have at least 3 tools. The three required tools are listed — add any 
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
+ Generates a short, shareable description of a complete outfit — the kind of thing someone would caption an Instagram post with. Must produce something different each time for different inputs.
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `outfit` (...): ...
+- `outfit` (...): result from suggest_outfit
 
 **What it returns:**
 <!-- Describe the return value -->
+A natural language text string for social media sharing, includes reference to the new item, the platform  and the price. Includes one sentence highlighting satisfaction for the item and that may connect back to the user's original input. 
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the outfit data is incomplete? -->
