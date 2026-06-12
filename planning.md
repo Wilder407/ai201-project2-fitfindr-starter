@@ -26,12 +26,12 @@ The search_listings tool takes in a user input, sets the input parameters with k
 
 **What it returns:**
 <!-- Describe the return value — what fields does a result contain? -->
-The result is a string output with the features for the top result. Fields are item title, price as USD, platform and item condition. Format "<item title> - <$price>, <platform>, <condition>"
+The result is a dict object with the features for the top result. Fields are item title, price as USD, platform and item condition. Format "item title - <$price>, platform, condition"
 
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if no listings match? -->
-If the search is unable to return items that match the user input, the agent stops and presents the user with a message noting that "No items match this search. Please search for another item". Do not continue to suggest_outfit.
+After search_listings runs, check if results is empty. If yes, set an error message in the session and return early. If no, set selected_item = results[0] and proceed to suggest_outfit.
 
 ---
 
@@ -48,12 +48,13 @@ This tool takes the item from search_listings and items in the user's wardrode. 
 
 **What it returns:**
 <!-- Describe the return value -->
-suggest_outfit returns natural language text that suggests an item in the existing wardrobe to pair the new item with. It also may suggest styling details. If there isn't an item to pair with, only suggest styling notes for the item. 
+Suggest_outfit returns natural language text that suggests an item in the existing wardrobe to pair the new item with. It also may suggest styling details. If there isn't an item to pair with, only suggest styling notes for the item. 
 
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the wardrobe is empty or no outfit can be suggested? -->
-If suggest_outfit fails, quit the loop and inform the user to try another item or increase items in wardrobe. DO not continue to create_fit_card without a complete result from suggest_outfit.
+
+After suggest_outfit runs, check if results is empty. If yes, set an error message in the session and return early. If no, set outfit_suggestion = "result" and proceed to create_fit_card.
 
 ---
 
@@ -65,7 +66,7 @@ If suggest_outfit fails, quit the loop and inform the user to try another item o
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
-- `outfit` (...): result from suggest_outfit
+- `outfit` (str): result from suggest_outfit
 
 **What it returns:**
 <!-- Describe the return value -->
@@ -73,7 +74,7 @@ A natural language text string for social media sharing, includes reference to t
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the outfit data is incomplete? -->
-
+After create_fit_card runs, check if results is empty. If yes, set an error message in the session and return early. If no, set fit_card = "result" and return session results.
 ---
 
 ### Additional Tools (if any)
@@ -86,6 +87,8 @@ A natural language text string for social media sharing, includes reference to t
 
 **How does your agent decide which tool to call next?**
 <!-- Describe the logic your planning loop uses. What does it look at? What conditions change its behavior? How does it know when it's done? -->
+The LLM that is driving the agent reads the conversation or context about what's been accomplished so far and decides what is still required to meet the goal.The agent adds to it's memory at each step and uses this collection of information to decide which tool it should use next. This project follows a linear path and doesn't require branching but that would be a consideration the LLM would make if necessary. 
+The LLM can determine when to move to the next step by reviewing which results are stored. If there is nothing returned for search_listings, the LLM will know to quit and provide the user with an error message. I'm excited to see how the agent can retain the input and stay within a tool instead of jumping out entirely. 
 
 ---
 
@@ -93,6 +96,9 @@ A natural language text string for social media sharing, includes reference to t
 
 **How does information from one tool get passed to the next?**
 <!-- Describe how your agent stores and accesses state within a session. What data is tracked? How is it passed between tool calls? -->
+When the tools return output, those results are added into the agent's context. Not all contents of the output are passed to the next tool but can be helpful in the output for that function. For example, suggest_outfit connects the new item to one in the wardrobe. The return string also shares styling information that can be inferred form the user's input or existing wardrobe items. The structured result from search_listing is stored in context and is passed as 'new_item' to suggest_outfit.The structured result from suggest_outfit is stored in context and is passed as 'outfit' to create_fit_card.  
+Wardrobe is stored as json records and is loaded at the time the user input in entered. The information is passed via a pipeline that passes outputs automatically. 
+
 
 ---
 
@@ -118,6 +124,37 @@ For each tool, describe the specific failure mode you're handling and what the a
      ASCII art, a Mermaid diagram (https://mermaid.js.org/syntax/flowchart.html), or an embedded
      sketch are all fine. You'll share this diagram with an AI tool when asking it to implement
      the planning loop and each individual tool. -->
+
+     user query
+     |
+     v
++--[ PLANNING LOOP ]---------------------------+
+|                                              |
+|  search_listings(desc, size, max_price)      |
+|       |                                      |
+|  results = []  -->  [ERROR] "No listings     |
+|                       found." --> EXIT       |
+|       |                                      |
+|  results = [item, ...]                       |
+|  session: selected_item = results[0]         |
+|       |                                      |
+|  suggest_outfit(selected_item, wardrobe)     |
+|       |                                      |
+|  outfit_suggestion = ""  --> [ERROR]         |
+|                       "Try another item"     |
+|                            --> EXIT          |
+|       |                                      |
+|  session: outfit_suggestion = "..."          |
+|       |                                      |
+|  create_fit_card(outfit_suggestion,          |
+|                  selected_item)              |
+|       |                                      |
+|  session: fit_card = "..."                   |
+|                                              |
++----------------------------------------------+
+     |
+     v
+ return session
 
 ---
 

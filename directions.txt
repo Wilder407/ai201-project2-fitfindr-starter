@@ -87,7 +87,7 @@ Getting started
     This is the same key from Project 1. If you haven't signed up yet, get a free key at console.groq.com — no credit card required.
 
 
-Milestone 1: Explore the Starter Repo and Understand the Problem
+**Milestone 1: Explore the Starter Repo and Understand the Problem**
 
 ⏰ ~30 min
 
