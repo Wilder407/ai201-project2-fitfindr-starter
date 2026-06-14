@@ -185,6 +185,10 @@ I'll test inputs where a wrong result would be obvious - for example, a low max_
 
 **Milestone 4 — Planning loop and state management:**
 
+I will provide Claude with the agent.py file and have it generate the run_agent function. I will verify that the correct parameters are being called and stored in the session, I will ask Claude to implement run_agent following the numbered steps in the planning.md file (State Management). Verification includes: checking that branching is correct, that it stores a dict session, that the three tools are not called unconditionally.
+
+I will have Claude call handle_query() in app.py calls run_agent() and maps the session dict to the three output panels. I will also have the code printsession["selected_item"] and confirming it's the exact same dict passed into suggest_outfit.. Claude will also ensure that the test cases have the expected agent response (i.e. agent.py and check that the no-results path (the second test case already in the file) returns an error message in session["error"] and leaves session["fit_card"] as None).
+
 ---
 
 ## A Complete Interaction (Step by Step)
@@ -195,12 +199,17 @@ Write out what a full user interaction looks like from start to finish — tool 
 
 **Step 1:**
 <!-- What does the agent do first? Which tool is called? With what input? -->
+The agent calls `search_listings` with description=vintage graphic tee, max_price=30.00, size=None. An list of items is returned and the best match is the input for setp 2. 
 
 **Step 2:**
 <!-- What happens next? What was returned from step 1? What tool is called now? -->
+`suggest_outfit` takes in `new_item` dict and `wardrobe` (example or empty depending on user selection) to create an outfit and styling instrctions. This ouput is passed to `create_fit_card`. An example could be "This vantage graphic tee makes the simplest of statements and looks best shrug off the shoulder with your baggy jeans."
 
 **Step 3:**
 <!-- Continue until the full interaction is complete -->
+`outfit` is passed to `create_fit_card` as a str. Returned is a natural language text string for social media sharing, includes reference to the new item, the platform  and the price. 
+
 
 **Final output to user:**
 <!-- What does the user actually see at the end? -->
+The user sees three panels: the listing result (item title, price, platform, condition), the outfit suggestion ("This vintage graphic tee looks best shrugged off the shoulder with your baggy jeans..."), and the fit card caption ("I can't wait to rock this new look from Depop for only $26!").
