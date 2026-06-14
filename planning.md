@@ -16,7 +16,7 @@ You must have at least 3 tools. The three required tools are listed — add any 
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
-The search_listings tool takes in a user input, sets the input parameters with keywords from the input. search_listings returns 3 matching listings sorted by relevance.
+The ```search_listings``` tool takes in a user input, sets the input parameters with keywords from the input. ```search_listings``` returns 3 matching listings sorted by relevance.
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
@@ -31,7 +31,7 @@ The result is a dict object with the features for the top result. Fields are ite
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if no listings match? -->
-After search_listings runs, check if results is empty. If yes, set an error message in the session and return early. If no, set selected_item = results[0] and proceed to suggest_outfit.
+After ```search_listings``` runs, check if results is empty. If yes, set an error message in the session and return early. If no, set ```selected_item = results[0]``` and proceed to ```suggest_outfit```.
 
 ---
 
@@ -39,7 +39,7 @@ After search_listings runs, check if results is empty. If yes, set an error mess
 
 **What it does:**
 <!-- Describe what this tool does in 1–2 sentences -->
-This tool takes the item from search_listings and items in the user's wardrode. The tools suggests one ore more complete outfits combinations. Must be able to handle empty wardrobe or minimal items. 
+This tool takes the item from ```search_listings``` and items in the user's wardrode. The tools suggests one ore more complete outfits combinations. Must be able to handle empty wardrobe or minimal items. 
 
 **Input parameters:**
 <!-- List each parameter, its type, and what it represents -->
@@ -54,7 +54,7 @@ Suggest_outfit returns natural language text that suggests an item in the existi
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the wardrobe is empty or no outfit can be suggested? -->
 
-After suggest_outfit runs, check if results is empty. If yes, set an error message in the session and return early. If no, set outfit_suggestion = "result" and proceed to create_fit_card.
+After ```suggest_outfit``` runs, check if results is empty. If yes, set an error message in the session and return early. If no, set ```outfit_suggestion = "result"``` and proceed to ```create_fit_card```.
 
 ---
 
@@ -74,7 +74,8 @@ A natural language text string for social media sharing, includes reference to t
 
 **What happens if it fails or returns nothing:**
 <!-- What should the agent do if the outfit data is incomplete? -->
-After create_fit_card runs, check if results is empty. If yes, set an error message in the session and return early. If no, set fit_card = "result" and return session results.
+After ```create_fit_card``` runs, check if results is empty. If yes, set an error message in the session and return early. If no, set fit_card = "result" and return session results.
+
 ---
 
 ### Additional Tools (if any)
@@ -88,7 +89,8 @@ After create_fit_card runs, check if results is empty. If yes, set an error mess
 **How does your agent decide which tool to call next?**
 <!-- Describe the logic your planning loop uses. What does it look at? What conditions change its behavior? How does it know when it's done? -->
 The LLM that is driving the agent reads the conversation or context about what's been accomplished so far and decides what is still required to meet the goal.The agent adds to it's memory at each step and uses this collection of information to decide which tool it should use next. This project follows a linear path and doesn't require branching but that would be a consideration the LLM would make if necessary. 
-The LLM can determine when to move to the next step by reviewing which results are stored. If there is nothing returned for search_listings, the LLM will know to quit and provide the user with an error message. I'm excited to see how the agent can retain the input and stay within a tool instead of jumping out entirely. 
+
+The LLM can determine when to move to the next step by reviewing which results are stored. If there is nothing returned for ```search_listings```, the LLM will know to quit and provide the user with an error message. I'm excited to see how the agent can retain the input and stay within a tool instead of jumping out entirely. 
 
 ---
 
@@ -96,7 +98,7 @@ The LLM can determine when to move to the next step by reviewing which results a
 
 **How does information from one tool get passed to the next?**
 <!-- Describe how your agent stores and accesses state within a session. What data is tracked? How is it passed between tool calls? -->
-When the tools return output, those results are added into the agent's context. Not all contents of the output are passed to the next tool but can be helpful in the output for that function. For example, suggest_outfit connects the new item to one in the wardrobe. The return string also shares styling information that can be inferred form the user's input or existing wardrobe items. The structured result from search_listing is stored in context and is passed as 'new_item' to suggest_outfit.The structured result from suggest_outfit is stored in context and is passed as 'outfit' to create_fit_card.  
+When the tools return output, those results are added into the agent's context. Not all contents of the output are passed to the next tool but can be helpful in the output for that function. For example, ```suggest_outfit``` connects the new item to one in the wardrobe. The return string also shares styling information that can be inferred form the user's input or existing wardrobe items. The structured result from ```search_listing``` is stored in context and is passed as ```new_item``` to ```suggest_outfit```.The structured result from ```suggest_outfit``` is stored in context and is passed as ```outfit``` to ```create_fit_card```.  
 Wardrobe is stored as json records and is loaded at the time the user input in entered. The information is passed via a pipeline that passes outputs automatically. 
 
 
@@ -108,9 +110,9 @@ For each tool, describe the specific failure mode you're handling and what the a
 
 | Tool | Failure mode | Agent response |
 |------|-------------|----------------|
-| search_listings | No results match the query | |
-| suggest_outfit | Wardrobe is empty | |
-| create_fit_card | Outfit input is missing or incomplete | |
+| ```search_listings``` | No results match the query | After search_listings runs, check if results is empty. If yes, set an error message in the session and return early. If no, set selected_item = results[0] and proceed to suggest_outfit.|
+| ```suggest_outfit``` | Wardrobe is empty | After suggest_outfit runs, check if results is empty. If yes, set an error message in the session and return early. If no, set outfit_suggestion = "result" and proceed to create_fit_card. |
+| ```create_fit_card``` | Outfit input is missing or incomplete | After create_fit_card runs, check if results is empty. If yes, set an error message in the session and return early. If no, set fit_card = "result" and return session results. |
 
 ---
 
@@ -125,6 +127,7 @@ For each tool, describe the specific failure mode you're handling and what the a
      sketch are all fine. You'll share this diagram with an AI tool when asking it to implement
      the planning loop and each individual tool. -->
 
+```
      user query
      |
      v
@@ -155,6 +158,7 @@ For each tool, describe the specific failure mode you're handling and what the a
      |
      v
  return session
+```
 
 ---
 
@@ -172,6 +176,12 @@ For each tool, describe the specific failure mode you're handling and what the a
      before trusting it" is a plan. -->
 
 **Milestone 3 — Individual tool implementations:**
+
+I will provide Claude with the Spec block from tools.py and specific constraints like load_listings() and failure modes. I will ask it to implement each function individually using the spec in tools.py. Before running, I will check that the parameters match, that the code properly handles the failure mode (outlined in planning.md) and stub signature.
+
+```suggest_outfit``` will use Groq to generate output based on the new_item and existing wardrobe. Groq will generate an outfit suggestion or If empty, suggest styling details instead of a returning an empty string. ```create_fit_card``` will check for temperature/variation for each output caption response.
+
+I'll test inputs where a wrong result would be obvious - for example, a low max_price where any result over that amount would indicate the price filter isn't working correctly. The same validation would apply to size and description.
 
 **Milestone 4 — Planning loop and state management:**
 
