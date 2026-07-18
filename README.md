@@ -2,6 +2,8 @@
 
 An AI shopping agent that finds a secondhand clothing listing matching your style and budget, suggests how to pair it with what you already own, and generates a ready-to-post caption for it — all from a single natural language request.
 
+[Watch the Demo](https://vimeo.com/1211039153?fl=ip&fe=ec)
+
 ## Overview
 
 Tell FitFindr what you're looking for ("vintage graphic tee under $30, I mostly wear baggy jeans and chunky sneakers") and it chains three tools together to go from search to a shareable outfit post:
